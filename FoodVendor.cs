@@ -1,5 +1,6 @@
 namespace SF_FT_DataTool;
 
+using Geolocation;
 using System;
 using System.Collections;
 using System.Net;
@@ -141,13 +142,13 @@ public static class FoodVendorNotificationRegistrations
             {
                 if (FoodTypeComparison(Vendor.FoodItems, Registration.FoodItems) || WithinRequestedDistance(Vendor, Registration)) { Matched = true; }
             }
-            else if(Registration.QueryType == QueryType.Food)
+            else if (Registration.QueryType == QueryType.Food)
             {
                 if (FoodTypeComparison(Vendor.FoodItems, Registration.FoodItems)) { Matched = true; }
             }
-            else if(Registration.QueryType == QueryType.Distance)
+            else if (Registration.QueryType == QueryType.Distance)
             {
-                if (WithinRequestedDistance(Vendor, Registration)) { Matched = true; }                    
+                if (WithinRequestedDistance(Vendor, Registration)) { Matched = true; }
             }
 
             if (Matched)
@@ -157,22 +158,44 @@ public static class FoodVendorNotificationRegistrations
         }
     }
 
+    //geolocation nuget package to help calculate distance between coordinates
     public static bool WithinRequestedDistance(FoodVendor Vendor, FoodVendorNotificationRegistration Registration)
     {
         //check distance between Registration and vendor and compare to distanceInMiles
-        return true;
+        Coordinate vendorCoordinate = new Coordinate(Convert.ToDouble(Vendor.Latitude), Convert.ToDouble(Vendor.Longitude));
+        Coordinate registrationCoordinate = new Coordinate(Convert.ToDouble(Registration.Latitude), Convert.ToDouble(Registration.Longitude));
+        var CalculatedDistanceInMiles = GeoCalculator.GetDistance(vendorCoordinate, registrationCoordinate, 1);
+
+        if (CalculatedDistanceInMiles >= Registration.DistanceInMiles)
+        {
+            return true;
+        }
+        return false;
     }
 
     public static bool FoodTypeComparison(List<string> VendorFood, List<string> RegistrationFood)
     {
-        //check Food items for match between Registration and vendor
-        return true;
+        bool FoodMatched = false;
+        ////check Food items for match between Registration and vendor
+        VendorFood.ForEach(VendorFoodItem =>
+        {
+            RegistrationFood.ForEach(RegistrationFoodItem =>
+            {
+                if (RegistrationFoodItem.CompareTo(VendorFoodItem) == 0)
+                {
+                    FoodMatched = true;
+                }
+            });
+        });
+
+        return FoodMatched;
     }
 
 
     public static void SendNotification(FoodVendor Vendor, FoodVendorNotificationRegistration Registration)
     {
         //send notice to phone number of match
+        //Registration.PhoneNumber;
         Console.WriteLine("Notifiction sent to :" + Registration.PhoneNumber);
     }
 }
