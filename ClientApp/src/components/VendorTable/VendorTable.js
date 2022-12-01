@@ -9,7 +9,7 @@ export class VendorTable extends Component {
   }
 
   componentDidMount() {
-    this.populateFoodVendors();
+      this.getApprovedFoodVendors();
   }
 
   static renderFoodVendorsTable(foodVendors) {
@@ -57,8 +57,8 @@ export class VendorTable extends Component {
     );
   }
 
-  async populateFoodVendors() {
-    const response = await fetch('foodvendor');
+  async getApprovedFoodVendors() {
+    const response = await fetch('foodvendor/approvedvendors');
     const data = await response.json();
     
     this.setState({ foodVendors: data, loading: false });
