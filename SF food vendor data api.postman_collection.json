@@ -1,0 +1,252 @@
+{
+	"info": {
+		"_postman_id": "7c75c9d3-a6f9-42a0-9cd5-778c3147f99a",
+		"name": "SF food vendor data api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12094493"
+	},
+	"item": [
+		{
+			"name": "Approved vendors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5170/foodvendor/ApprovedVendors",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"ApprovedVendors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Requested vendors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5170/foodvendor/RequestedVendors",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"RequestedVendors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notification registrations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5170/foodvendor/RequestedVendors",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"RequestedVendors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notification",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "PhoneNumber",
+							"value": "8012448881",
+							"type": "text"
+						},
+						{
+							"key": "FoodItems",
+							"value": "barbecue:pizza:tortelloni",
+							"type": "text"
+						},
+						{
+							"key": "Latitude",
+							"value": "37.74925585952909",
+							"type": "text"
+						},
+						{
+							"key": "Longitude",
+							"value": "-122.39097537957679",
+							"type": "text"
+						},
+						{
+							"key": "DistanceInMiles",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "Type",
+							"value": "Distance",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5170/foodvendor/NotificationRegistrations",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"NotificationRegistrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "simulate new vendor",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "FoodItems",
+							"value": "tacos:barbecue:chicken:soda",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "tacos of mother pearl",
+							"type": "text"
+						},
+						{
+							"key": "Latitude",
+							"value": "37.74925585952909",
+							"type": "text"
+						},
+						{
+							"key": "Longitude",
+							"value": "-122.38097537957679",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5170/foodvendor/SimulateNewVendor",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"SimulateNewVendor"
+					],
+					"query": [
+						{
+							"key": "FoodItems",
+							"value": "Tacos:enchiladas:pupusa",
+							"disabled": true
+						},
+						{
+							"key": "Name",
+							"value": "Tacos of mother",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notification Registration",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "PhoneNumber",
+							"value": "8012448881",
+							"type": "text"
+						},
+						{
+							"key": "FoodItems",
+							"value": "barbecue:pizza:tortelloni:spaghetti",
+							"type": "text"
+						},
+						{
+							"key": "Latitude",
+							"value": "37.74925585952909",
+							"type": "text"
+						},
+						{
+							"key": "Longitude",
+							"value": "-122.39097537957679",
+							"type": "text"
+						},
+						{
+							"key": "DistanceInMiles",
+							"value": ".9",
+							"type": "text"
+						},
+						{
+							"key": "Type",
+							"value": "Either",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5170/foodvendor/NotificationRegistrations/c232c91f-a2b9-4673-839a-9106fbea2c18",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"NotificationRegistrations",
+						"c232c91f-a2b9-4673-839a-9106fbea2c18"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Notification Registration",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:5170/foodvendor/NotificationRegistrations/c232c91f-a2b9-4673-839a-9106fbea2c18",
+					"host": [
+						"localhost"
+					],
+					"port": "5170",
+					"path": [
+						"foodvendor",
+						"NotificationRegistrations",
+						"c232c91f-a2b9-4673-839a-9106fbea2c18"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
