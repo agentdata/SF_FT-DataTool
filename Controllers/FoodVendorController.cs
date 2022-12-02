@@ -7,12 +7,14 @@ namespace SF_FT_DataTool.Controllers;
 [Route("[controller]")]
 public class FoodVendorController : Controller
 {
+
     [HttpGet]
     [Route("ApprovedVendors")]
     public string GetApprovedVendors()
     {
         return FoodVendorList.ApprovedToJson();
     }
+
     [HttpGet]
     [Route("RequestedVendors")]
     public string GetRequestedVendors()
@@ -20,58 +22,136 @@ public class FoodVendorController : Controller
         return FoodVendorList.RequestedToJson();
     }
 
+    [HttpGet]
+    [Route("NotificationRegistrations")]
+    public string GetNotificationRegistrations()
+    {
+        return FoodVendorNotificationRegistrations.AllToJson();
+    }
+
+
+
+
     [HttpPost]
     [Route("SimulateNewVendor")]
     public string SimulateNewVendor()
     {
-        FoodVendorList.SimulateNewVendor(Name: Request.Form["Name"].ToString(), _FoodItems: Request.Form["FoodItems"].ToString(), _Latitude: Request.Form["Latitude"].ToString(), _Longitude: Request.Form["Longitude"].ToString());
-        return "New Vendor addition simulated.";
+        //validations
+        try
+        {
+            FoodVendorList.SimulateNewVendor(Name: Request.Form["Name"].ToString(), _FoodItems: Request.Form["FoodItems"].ToString(), _Latitude: Request.Form["Latitude"].ToString(), _Longitude: Request.Form["Longitude"].ToString());
+        }
+        catch (Exception e)
+        {
+            return JsonResponses.BuildError("SimulateNewVendor failed to add new vendor.");
+        }
+        return JsonResponses.BuildGoodResponse("New Vendor addition simulated.");
     }
 
 
     [HttpPost]
-    [Route("FoodVendorNotifications")]
-    public void NewFoodVendorNotifications()
+    [Route("NotificationRegistrations")]
+    public string NewFoodVendorNotifications()
     {
         //validate parsing distance as double and querytype as a one of the proper enums Food, Distance, Either
 
-        //QueryType QueryTypeValue;
-        //try
-        //{
-        //    switch (Request.Form["Type"].ToString())
-        //    {
-        //        case "Food": QueryTypeValue = QueryType.Food; break;
-        //        case "Distance": QueryTypeValue = QueryType.Distance; break;
-        //        case "Either": QueryTypeValue = QueryType.Either; break;
-        //        default: throw new Exception();
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    Console.WriteLine("{0} Exception caught.", e);
-        //}
+        QueryType QueryTypeValue;
+        try
+        {
+            QueryTypeValue = QueryEnumHelper.GetQueryType(Request.Form["Type"].ToString());
+        }
+        catch (Exception e)
+        {
+            return JsonResponses.BuildError("Type must be one of the following {Food, Distance, Either}");
+        }
 
 
         double DistanceInMilesValue = -1;
         try
         {
             DistanceInMilesValue = Convert.ToDouble(Request.Form["DistanceInMiles"].ToString());
+            if(DistanceInMilesValue < 0)
+            {
+                return JsonResponses.BuildError("DistanceInMiles needs to be a positive number.");
+            }
 
         }
         catch (Exception e)
         {
-            Console.WriteLine("{0} Exception caught.", e);
+            return JsonResponses.BuildError("DistanceInMiles needs to be a number.");
         }
 
 
-        FoodVendorNotificationRegistrations.addNewRegistration(
+        return (JsonResponses.BuildGoodResponse("New Registration added successfuly, Id: "+FoodVendorNotificationRegistrations.addNewRegistration(
             _PhoneNumber: Request.Form["PhoneNumber"].ToString(),
             _FoodItems: Request.Form["FoodItems"].ToString(),
             _Longitude: Request.Form["Longitude"].ToString(),
             _Latitude: Request.Form["Latitude"].ToString(),
             _DistanceInMiles: DistanceInMilesValue,
-            _QueryType: Request.Form["Type"].ToString());
-        //FoodVendorNotifications
-        Console.WriteLine("posted something");
+            _QueryType: Request.Form["Type"].ToString())));
+    }
+
+
+
+    [HttpPut]
+    [Route("NotificationRegistrations/{id?}")]
+    public string UpdateNotificationRegistration(string? Id)
+    {
+        //validate ID is guid format.
+        try
+        {
+            Guid.Parse(Id);
+        }
+        catch (Exception e)
+        {
+            return JsonResponses.BuildError("Id provided is not a valid GUID");
+        }
+
+        double DistanceInMilesValue = -1;
+        try
+        {
+            DistanceInMilesValue = Convert.ToDouble(Request.Form["DistanceInMiles"].ToString());
+            if (DistanceInMilesValue < 0)
+            {
+                return JsonResponses.BuildError("DistanceInMiles needs to be a positive number.");
+            }
+
+        }
+        catch (Exception e)
+        {
+            return JsonResponses.BuildError("DistanceInMiles needs to be a number.");
+        }
+
+        if(FoodVendorNotificationRegistrations.UpdateNotificationRegistration(
+            Id,
+            _PhoneNumber: Request.Form["PhoneNumber"].ToString(),
+            _FoodItems: Request.Form["FoodItems"].ToString(),
+            _Longitude: Request.Form["Longitude"].ToString(),
+            _Latitude: Request.Form["Latitude"].ToString(),
+            _DistanceInMiles: DistanceInMilesValue,
+            _QueryType: Request.Form["Type"].ToString()))
+        {
+            return JsonResponses.BuildGoodResponse("NotificationRegistration updated successfully.");
+        }
+        else
+        {
+            return JsonResponses.BuildError("Something went wrong updating this notificationRegistration.");
+        }
+    }
+
+    [HttpDelete]
+    [Route("NotificationRegistrations/{id?}")]
+    public string DeleteNotificationRegistration(string? Id)
+    {
+        //validate ID is guid format.
+        try
+        {
+            Guid.Parse(Id);
+        }
+        catch (Exception e)
+        {
+            return JsonResponses.BuildError("Id provided is not a valid GUID");
+        }
+        return JsonResponses.BuildGoodResponse(FoodVendorNotificationRegistrations.RemoveRegistration(Id));   
     }
 }

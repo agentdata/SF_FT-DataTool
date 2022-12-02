@@ -98,18 +98,26 @@ public class FoodVendorNotificationRegistration
 {
     public string? PhoneNumber { get; set; }
     public List<string>? FoodItems { get; set; }
+    public string? Id { get; set; }
     public string? Longitude { get; set; }
     public string? Latitude { get; set; }
     public double? DistanceInMiles { get; set; }
     public QueryType QueryType { get; set; }
 
+    public void UpdateNotificationRegistration(string _PhoneNumber, List<string>? _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    {
+        this.PhoneNumber = _PhoneNumber;
+        this.FoodItems = _FoodItems;
+        this.Longitude = _Longitude;
+        this.Latitude = _Latitude;
+        this.DistanceInMiles = _DistanceInMiles;
+        this.QueryType = QueryEnumHelper.GetQueryType(_QueryType);
+    }
 }
 
-public static class FoodVendorNotificationRegistrations
+public static class QueryEnumHelper
 {
-    public static List<FoodVendorNotificationRegistration> Registrations { get; set; } = new List<FoodVendorNotificationRegistration>();
-
-    public static void addNewRegistration(string _PhoneNumber, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    public static QueryType GetQueryType(string _QueryType)
     {
         QueryType QueryTypeValue;
         switch (_QueryType)
@@ -119,17 +127,29 @@ public static class FoodVendorNotificationRegistrations
             case "Either": QueryTypeValue = QueryType.Either; break;
             default: throw new Exception();
         }
+        return QueryTypeValue;
+    }
+}
 
+public static class FoodVendorNotificationRegistrations
+{
+    public static List<FoodVendorNotificationRegistration> Registrations { get; set; } = new List<FoodVendorNotificationRegistration>();
+
+    public static string addNewRegistration(string _PhoneNumber, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    {
+        string Id = Guid.NewGuid().ToString();
         FoodVendorNotificationRegistration newRegistration = new FoodVendorNotificationRegistration
         {
             PhoneNumber = _PhoneNumber,
+            Id = Id,
             FoodItems = _FoodItems.Split(':').ToList<string>(),
             Longitude = _Longitude,
             Latitude = _Latitude,
             DistanceInMiles = _DistanceInMiles,
-            QueryType = QueryTypeValue
+            QueryType = QueryEnumHelper.GetQueryType(_QueryType)
         };
         Registrations.Add(newRegistration);
+        return Id;
     }
 
     public static void CheckRegistrationsForMatch(FoodVendor Vendor)
@@ -197,6 +217,41 @@ public static class FoodVendorNotificationRegistrations
         //send notice to phone number of match
         //Registration.PhoneNumber;
         Console.WriteLine("Notifiction sent to :" + Registration.PhoneNumber);
+    }
+
+    //Filter for Requested only and serialize list as JSON
+    public static string AllToJson()
+    {
+        return JsonSerializer.Serialize(Registrations);
+    }
+
+    public static string RemoveRegistration(string? _Id)
+    {
+        var tempRegistration = Registrations.Find(Registration => Registration.Id.CompareTo(_Id) == 0);
+
+        if (Registrations.Remove(tempRegistration)) { return "Removed successfully"; }
+        else { return "failed to find or remove the provided ID"; }
+        
+    }
+
+    internal static bool UpdateNotificationRegistration(string? _Id, string _PhoneNumber, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    {
+        try
+        {
+            Registrations.Find(Registration => Registration.Id.CompareTo(_Id) == 0).UpdateNotificationRegistration(
+                 _PhoneNumber,
+                 _FoodItems.Split(':').ToList<string>(),
+                 _Longitude,
+                 _Latitude,
+                 _DistanceInMiles,
+                 _QueryType
+                );
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
 
