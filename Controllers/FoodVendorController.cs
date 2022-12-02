@@ -83,7 +83,7 @@ public class FoodVendorController : Controller
 
 
         return (JsonResponses.BuildGoodResponse("New Registration added successfuly, Id: "+FoodVendorNotificationRegistrations.addNewRegistration(
-            _PhoneNumber: Request.Form["PhoneNumber"].ToString(),
+            _WehbookAddress: Request.Form["WehbookAddress"].ToString(),
             _FoodItems: Request.Form["FoodItems"].ToString(),
             _Longitude: Request.Form["Longitude"].ToString(),
             _Latitude: Request.Form["Latitude"].ToString(),
@@ -124,7 +124,7 @@ public class FoodVendorController : Controller
 
         if(FoodVendorNotificationRegistrations.UpdateNotificationRegistration(
             Id,
-            _PhoneNumber: Request.Form["PhoneNumber"].ToString(),
+            _WehbookAddress: Request.Form["WebhookAddress"].ToString(),
             _FoodItems: Request.Form["FoodItems"].ToString(),
             _Longitude: Request.Form["Longitude"].ToString(),
             _Latitude: Request.Form["Latitude"].ToString(),

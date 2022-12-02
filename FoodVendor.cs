@@ -4,9 +4,12 @@ using Geolocation;
 using System;
 using System.Collections;
 using System.Net;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using static SF_FT_DataTool.FoodVendorNotificationRegistration;
 public enum QueryType { Food, Distance, Either }
+
 public class FoodVendor
 {
     public string? VendorId { get; set; }
@@ -96,7 +99,7 @@ public static class FoodVendorList
 
 public class FoodVendorNotificationRegistration
 {
-    public string? PhoneNumber { get; set; }
+    public string? WehbookAddress { get; set; }
     public List<string>? FoodItems { get; set; }
     public string? Id { get; set; }
     public string? Longitude { get; set; }
@@ -104,9 +107,9 @@ public class FoodVendorNotificationRegistration
     public double? DistanceInMiles { get; set; }
     public QueryType QueryType { get; set; }
 
-    public void UpdateNotificationRegistration(string _PhoneNumber, List<string>? _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    public void UpdateNotificationRegistration(string _WehbookAddress, List<string>? _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
     {
-        this.PhoneNumber = _PhoneNumber;
+        this.WehbookAddress = _WehbookAddress;
         this.FoodItems = _FoodItems;
         this.Longitude = _Longitude;
         this.Latitude = _Latitude;
@@ -133,14 +136,16 @@ public static class QueryEnumHelper
 
 public static class FoodVendorNotificationRegistrations
 {
+    //for webhook sending
+    private static readonly HttpClient client = new HttpClient();
     public static List<FoodVendorNotificationRegistration> Registrations { get; set; } = new List<FoodVendorNotificationRegistration>();
 
-    public static string addNewRegistration(string _PhoneNumber, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    public static string addNewRegistration(string _WehbookAddress, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
     {
         string Id = Guid.NewGuid().ToString();
         FoodVendorNotificationRegistration newRegistration = new FoodVendorNotificationRegistration
         {
-            PhoneNumber = _PhoneNumber,
+            WehbookAddress = _WehbookAddress,
             Id = Id,
             FoodItems = _FoodItems.Split(':').ToList<string>(),
             Longitude = _Longitude,
@@ -196,7 +201,7 @@ public static class FoodVendorNotificationRegistrations
     public static bool FoodTypeComparison(List<string> VendorFood, List<string> RegistrationFood)
     {
         bool FoodMatched = false;
-        ////check Food items for match between Registration and vendor
+        //check Food items for match between Registration and vendor
         VendorFood.ForEach(VendorFoodItem =>
         {
             RegistrationFood.ForEach(RegistrationFoodItem =>
@@ -216,7 +221,19 @@ public static class FoodVendorNotificationRegistrations
     {
         //send notice to phone number of match
         //Registration.PhoneNumber;
-        Console.WriteLine("Notifiction sent to :" + Registration.PhoneNumber);
+
+        var values = new Dictionary<string, string>
+          {
+              { "Message", "New Food vendor has been added which matches your registration." },
+              { "Vendor", JsonSerializer.Serialize(Vendor) }
+          };
+
+        var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
+        var response = client.PostAsync(Registration.WehbookAddress, content);
+
+        //var responseString = await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine("Notifiction sent to :" + Registration.WehbookAddress);
     }
 
     //Filter for Requested only and serialize list as JSON
@@ -231,15 +248,17 @@ public static class FoodVendorNotificationRegistrations
 
         if (Registrations.Remove(tempRegistration)) { return "Removed successfully"; }
         else { return "failed to find or remove the provided ID"; }
-        
+
     }
 
-    internal static bool UpdateNotificationRegistration(string? _Id, string _PhoneNumber, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
+    internal static bool UpdateNotificationRegistration(string? _Id, string _WehbookAddress, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
     {
         try
         {
-            Registrations.Find(Registration => Registration.Id.CompareTo(_Id) == 0).UpdateNotificationRegistration(
-                 _PhoneNumber,
+            FoodVendorNotificationRegistration RegistrationToUpdate = Registrations.Find(Registration => Registration.Id.CompareTo(_Id) == 0);
+
+            RegistrationToUpdate.UpdateNotificationRegistration(
+                 _WehbookAddress,
                  _FoodItems.Split(':').ToList<string>(),
                  _Longitude,
                  _Latitude,
