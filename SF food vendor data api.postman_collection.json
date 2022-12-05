@@ -93,7 +93,8 @@
 						},
 						{
 							"key": "FoodItems",
-							"value": "barbecue:pizza:tortelloni",
+							"value": "pizza:tortelloni",
+							"description": "Food items separated by :",
 							"type": "text"
 						},
 						{
@@ -114,6 +115,7 @@
 						{
 							"key": "Type",
 							"value": "Distance",
+							"description": "Distance OR Food OR Either",
 							"type": "text"
 						}
 					]
@@ -139,9 +141,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if(pm.response.status == 200){\r",
-							"    postman.setEnvironmentVariable(\"id\", pm.response.body.id);\r",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -156,6 +156,7 @@
 						{
 							"key": "FoodItems",
 							"value": "tacos:barbecue:chicken:soda",
+							"description": "Food items separated by :",
 							"type": "text"
 						},
 						{
@@ -216,7 +217,8 @@
 						},
 						{
 							"key": "FoodItems",
-							"value": "barbecue:pizza:tortelloni:spaghetti",
+							"value": "pizza:tortelloni:spaghetti",
+							"description": "Food items separated by :",
 							"type": "text"
 						},
 						{
@@ -231,12 +233,13 @@
 						},
 						{
 							"key": "DistanceInMiles",
-							"value": ".4",
+							"value": ".5",
 							"type": "text"
 						},
 						{
 							"key": "Type",
-							"value": "Either",
+							"value": "Distance",
+							"description": "Distance OR Food OR Either",
 							"type": "text"
 						}
 					]
