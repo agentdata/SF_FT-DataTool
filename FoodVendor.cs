@@ -287,7 +287,7 @@ public static class FoodVendorNotificationRegistrations
 
         //var responseString = await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine("Notifiction sent to :" + Registration.WehbookAddress);
+        Console.WriteLine("Notifiction sent to: " + Registration.WehbookAddress);
     }
 
     //Filter for Requested only and serialize list as JSON
