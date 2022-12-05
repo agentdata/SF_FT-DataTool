@@ -10,6 +10,10 @@ using System.Text.Json.Nodes;
 using static SF_FT_DataTool.FoodVendorNotificationRegistration;
 public enum QueryType { Food, Distance, Either }
 
+/// <summary>
+/// A Food Vendor object Loosely matching the Food Vendor data from SF food vendor CSV file.
+/// There is are some fields missing from this representation, but important core fields for interested parties are stored and record.
+/// </summary>
 public class FoodVendor
 {
     public string? VendorId { get; set; }
@@ -31,6 +35,10 @@ public class FoodVendor
     }
 }
 
+
+/// <summary>
+/// Static class which holds a list of <FoodVendor> objects and provides some functions to work with the food vendor data.
+/// </summary>
 public static class FoodVendorList
 {
     public static List<FoodVendor> FoodVendors { get; set; } = new List<FoodVendor>();
@@ -61,7 +69,13 @@ public static class FoodVendorList
         return ApprovedFoodVendors;
     }
 
-    //Simulate adding a new vendor with the provided name, food items and lat/lon
+    /// <summary>
+    /// Simulate adding a new vendor with the provided name, food items and lat/lon
+    /// </summary>
+    /// <param name="Name"></param>
+    /// <param name="_FoodItems"></param>
+    /// <param name="_Latitude"></param>
+    /// <param name="_Longitude"></param>
     internal static void SimulateNewVendor(string Name, string _FoodItems, string _Latitude, string _Longitude)
     {
         var LocationId = Guid.NewGuid().ToString();
@@ -97,6 +111,9 @@ public static class FoodVendorList
     }
 }
 
+/// <summary>
+/// Food Vendor Notification Registration.
+/// </summary>
 public class FoodVendorNotificationRegistration
 {
     public string? WehbookAddress { get; set; }
@@ -118,6 +135,9 @@ public class FoodVendorNotificationRegistration
     }
 }
 
+/// <summary>
+/// Helper class for QueryTyp Enum used in Food Vendor Notification Registration.
+/// </summary>
 public static class QueryEnumHelper
 {
     public static QueryType GetQueryType(string _QueryType)
@@ -134,12 +154,25 @@ public static class QueryEnumHelper
     }
 }
 
+/// <summary>
+/// This static class contains a list of <FoodVendorNotificationRegistration> objects named Registrations and provides some methods for functionality with the List.
+/// </summary>
 public static class FoodVendorNotificationRegistrations
 {
     //for webhook sending
     private static readonly HttpClient client = new HttpClient();
     public static List<FoodVendorNotificationRegistration> Registrations { get; set; } = new List<FoodVendorNotificationRegistration>();
 
+    /// <summary>
+    /// Adds a new <FoodVendorNotificationRegistration> to the Registrations List.
+    /// </summary>
+    /// <param name="_WehbookAddress"></param>
+    /// <param name="_FoodItems"></param>
+    /// <param name="_Longitude"></param>
+    /// <param name="_Latitude"></param>
+    /// <param name="_DistanceInMiles"></param>
+    /// <param name="_QueryType"></param>
+    /// <returns>The new ID associated with this Registration.</returns>
     public static string addNewRegistration(string _WehbookAddress, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
     {
         string Id = Guid.NewGuid().ToString();
@@ -157,6 +190,11 @@ public static class FoodVendorNotificationRegistrations
         return Id;
     }
 
+    /// <summary>
+    /// This method is called when a new <FoodVendor> is added. It compares the new <FoodVendor> with all existing NotificationRegistration objects.
+    /// Comparing if the distance or food list are a match.
+    /// </summary>
+    /// <param name="Vendor"></param>
     public static void CheckRegistrationsForMatch(FoodVendor Vendor)
     {
         foreach (FoodVendorNotificationRegistration Registration in Registrations)
@@ -183,7 +221,13 @@ public static class FoodVendorNotificationRegistrations
         }
     }
 
-    //geolocation nuget package to help calculate distance between coordinates
+    /// <summary>
+    /// This function checks the distance between Vendor and Registration by utilizing the
+    /// geolocation nuget package which calculates the distance between coordinates.
+    /// </summary>
+    /// <param name="Vendor"></param>
+    /// <param name="Registration"></param>
+    /// <returns>bool which indicates true if the distance in Miles between Vendor and registration is less than or equal to the distance specified in the Registration object.</returns>
     public static bool WithinRequestedDistance(FoodVendor Vendor, FoodVendorNotificationRegistration Registration)
     {
         //check distance between Registration and vendor and compare to distanceInMiles
@@ -198,6 +242,12 @@ public static class FoodVendorNotificationRegistrations
         return false;
     }
 
+    /// <summary>
+    /// This method compares food item lists for a match.
+    /// </summary>
+    /// <param name="VendorFood"></param>
+    /// <param name="RegistrationFood"></param>
+    /// <returns>bool which indicates true if the Vendor food is found in the notification registration.</returns>
     public static bool FoodTypeComparison(List<string> VendorFood, List<string> RegistrationFood)
     {
         bool FoodMatched = false;
@@ -216,7 +266,11 @@ public static class FoodVendorNotificationRegistrations
         return FoodMatched;
     }
 
-
+    /// <summary>
+    /// This method sends a webhook with data to the address found in the Registration.
+    /// </summary>
+    /// <param name="Vendor"></param>
+    /// <param name="Registration"></param>
     public static void SendNotification(FoodVendor Vendor, FoodVendorNotificationRegistration Registration)
     {
         //send notice to phone number of match
@@ -242,6 +296,12 @@ public static class FoodVendorNotificationRegistrations
         return JsonSerializer.Serialize(Registrations);
     }
 
+
+    /// <summary>
+    /// Removes the NotificationRegistration in the list identified by the specified Guid formatted ID.
+    /// </summary>
+    /// <param name="_Id"></param>
+    /// <returns>returns a string intended for the client side indicating if the registration was removed or not.</returns>
     public static string RemoveRegistration(string? _Id)
     {
         var tempRegistration = Registrations.Find(Registration => Registration.Id.CompareTo(_Id) == 0);
@@ -251,6 +311,17 @@ public static class FoodVendorNotificationRegistrations
 
     }
 
+    /// <summary>
+    /// This Method updates a NotificationRegistration
+    /// </summary>
+    /// <param name="_Id"></param>
+    /// <param name="_WehbookAddress"></param>
+    /// <param name="_FoodItems"></param>
+    /// <param name="_Longitude"></param>
+    /// <param name="_Latitude"></param>
+    /// <param name="_DistanceInMiles"></param>
+    /// <param name="_QueryType"></param>
+    /// <returns>Returns a bool which is true if the Registration was updated and false if there was an issue.</returns>
     internal static bool UpdateNotificationRegistration(string? _Id, string _WehbookAddress, string _FoodItems, string _Longitude, string _Latitude, double _DistanceInMiles, string _QueryType)
     {
         try
@@ -274,9 +345,17 @@ public static class FoodVendorNotificationRegistrations
     }
 }
 
+/// <summary>
+/// This class is used for working with the SF food vendor  CSV data.
+/// </summary>
 public static class FoodVendorUpdate
 {
-    // reference from https://stackoverflow.com/questions/11082062/how-to-read-a-csv-file-from-a-url
+    /// <summary>
+    /// This method fetches and reads a file, in this case a CSV
+    /// reference from https://stackoverflow.com/questions/11082062/how-to-read-a-csv-file-from-a-url
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns>Returns a string which contains the contents of the CSV</returns>
     public static string GetCSV(string url)
     {
         HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
@@ -289,7 +368,11 @@ public static class FoodVendorUpdate
         return results;
     }
 
-    //fetches the latest data from DataSF downloadable CSV
+    /// <summary>
+    /// Fetches the current CSV file from DataSF, parses the data out to fit the <FoodVendor> Object.
+    /// This method is intended to pull the data initially, it does not update the data.
+    /// //TODO Update this method to update the FoodVendor list instead of just add, 
+    /// </summary>
     public static void FetchVendors()
     {
         List<FoodVendor> parsedVendorsList = new List<FoodVendor>();
@@ -384,10 +467,9 @@ public static class FoodVendorUpdate
                     Status = Status,
                     FoodItems = FoodItems
                 };
-
+                //TODO check if foodvendor already exists before.
                 FoodVendorList.FoodVendors.Add(vendor);
             }
         }
     }
 }
-

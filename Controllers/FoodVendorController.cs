@@ -7,7 +7,10 @@ namespace SF_FT_DataTool.Controllers;
 [Route("[controller]")]
 public class FoodVendorController : Controller
 {
-
+    /// <summary>
+    /// This endpoint returns a json formatted list containing all the vendors with a status of "Requested". 
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("ApprovedVendors")]
     public string GetApprovedVendors()
@@ -15,6 +18,10 @@ public class FoodVendorController : Controller
         return FoodVendorList.ApprovedToJson();
     }
 
+    /// <summary>
+    /// This endpoint returns a json formatted list containing all the vendors with a status of "Requested". 
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("RequestedVendors")]
     public string GetRequestedVendors()
@@ -22,6 +29,10 @@ public class FoodVendorController : Controller
         return FoodVendorList.RequestedToJson();
     }
 
+    /// <summary>
+    /// This endpoint returns a json formatted list containing all NotificationRegistrations.
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("NotificationRegistrations")]
     public string GetNotificationRegistrations()
@@ -30,8 +41,10 @@ public class FoodVendorController : Controller
     }
 
 
-
-
+    /// <summary>
+    /// This Endpoint simulates a new Food Vendor being added to the list, requires Name, FoodItems list and Latitude/Longitude coordinates.
+    /// </summary>
+    /// <returns></returns>
     [HttpPost]
     [Route("SimulateNewVendor")]
     public string SimulateNewVendor()
@@ -39,7 +52,11 @@ public class FoodVendorController : Controller
         //validations
         try
         {
-            FoodVendorList.SimulateNewVendor(Name: Request.Form["Name"].ToString(), _FoodItems: Request.Form["FoodItems"].ToString(), _Latitude: Request.Form["Latitude"].ToString(), _Longitude: Request.Form["Longitude"].ToString());
+            FoodVendorList.SimulateNewVendor(
+                Name: Request.Form["Name"].ToString(),
+                _FoodItems: Request.Form["FoodItems"].ToString(),
+                _Latitude: Request.Form["Latitude"].ToString(),
+                _Longitude: Request.Form["Longitude"].ToString());
         }
         catch (Exception e)
         {
@@ -48,7 +65,10 @@ public class FoodVendorController : Controller
         return JsonResponses.BuildGoodResponse("New Vendor addition simulated.");
     }
 
-
+    /// <summary>
+    /// This endpoint adds a new NotificationRegistration to the list.
+    /// </summary>
+    /// <returns>Returns the ID of the newly added NotificationRegistration</returns>
     [HttpPost]
     [Route("NotificationRegistrations")]
     public string NewFoodVendorNotifications()
@@ -92,7 +112,11 @@ public class FoodVendorController : Controller
     }
 
 
-
+    /// <summary>
+    /// This endpoint updates a NotificationRegistration identified by the provided ID. All NotificationRegistration Details are required.
+    /// </summary>
+    /// <param name="Id"></param>
+    /// <returns>returns a string with results of the udpate.</returns>
     [HttpPut]
     [Route("NotificationRegistrations/{id?}")]
     public string UpdateNotificationRegistration(string? Id)
@@ -139,6 +163,11 @@ public class FoodVendorController : Controller
         }
     }
 
+    /// <summary>
+    /// This endpoint deletes a NotificationRegistration identified by the provided ID.
+    /// </summary>
+    /// <param name="Id"></param>
+    /// <returns></returns>
     [HttpDelete]
     [Route("NotificationRegistrations/{id?}")]
     public string DeleteNotificationRegistration(string? Id)
