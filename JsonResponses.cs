@@ -12,10 +12,10 @@ namespace SF_FT_DataTool
             return jsonError;
 		}
 
-        public static string BuildGoodResponse(string SuccessMessage)
+        public static string BuildGoodResponse(string[] SuccessMessage)
         {
-            var jsonError = JsonSerializer.Serialize(new { SuccessMessage });
-            return jsonError;
+            var jsonSuccess = JsonSerializer.Serialize(new { SuccessMessage });
+            return jsonSuccess;
         }
     }
 }

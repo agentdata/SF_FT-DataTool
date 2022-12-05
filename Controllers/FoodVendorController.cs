@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace SF_FT_DataTool.Controllers;
 
@@ -62,7 +63,7 @@ public class FoodVendorController : Controller
         {
             return JsonResponses.BuildError("SimulateNewVendor failed to add new vendor.");
         }
-        return JsonResponses.BuildGoodResponse("New Vendor addition simulated.");
+        return JsonResponses.BuildGoodResponse(new string[] { "New Vendor addition simulated." });
     }
 
     /// <summary>
@@ -102,13 +103,13 @@ public class FoodVendorController : Controller
         }
 
 
-        return (JsonResponses.BuildGoodResponse("New Registration added successfuly, Id: "+FoodVendorNotificationRegistrations.addNewRegistration(
+        return (JsonSerializer.Serialize( new {Id=FoodVendorNotificationRegistrations.addNewRegistration(
             _WehbookAddress: Request.Form["WehbookAddress"].ToString(),
             _FoodItems: Request.Form["FoodItems"].ToString(),
             _Longitude: Request.Form["Longitude"].ToString(),
             _Latitude: Request.Form["Latitude"].ToString(),
             _DistanceInMiles: DistanceInMilesValue,
-            _QueryType: Request.Form["Type"].ToString())));
+            _QueryType: Request.Form["Type"].ToString())}));
     }
 
 
@@ -155,7 +156,7 @@ public class FoodVendorController : Controller
             _DistanceInMiles: DistanceInMilesValue,
             _QueryType: Request.Form["Type"].ToString()))
         {
-            return JsonResponses.BuildGoodResponse("NotificationRegistration updated successfully.");
+            return JsonResponses.BuildGoodResponse(new string[] { "NotificationRegistration updated successfully." });
         }
         else
         {
@@ -181,6 +182,6 @@ public class FoodVendorController : Controller
         {
             return JsonResponses.BuildError("Id provided is not a valid GUID");
         }
-        return JsonResponses.BuildGoodResponse(FoodVendorNotificationRegistrations.RemoveRegistration(Id));   
+        return JsonResponses.BuildGoodResponse(new string[] { FoodVendorNotificationRegistrations.RemoveRegistration(Id) });   
     }
 }
